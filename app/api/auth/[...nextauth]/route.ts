@@ -1,4 +1,5 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
+import { options } from './options'
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcryptjs from 'bcryptjs'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
@@ -7,58 +8,58 @@ import prisma from "@/app/libs/prismadb"
 
 
 
-const authOptions: NextAuthOptions = {
+// const authOptions: NextAuthOptions = {
 
-    adapter: PrismaAdapter(prisma),
+//     adapter: PrismaAdapter(prisma),
 
-    providers: [
-        CredentialsProvider({
-          // The name to display on the sign in form (e.g. 'Sign in with...')
-          name: 'Credentials',
-          // The credentials is used to generate a suitable form on the sign in page.
-          // You can specify whatever fields you are expecting to be submitted.
-          // e.g. domain, username, password, 2FA token, etc.
-          // You can pass any HTML attribute to the <input> tag through the object.
-          credentials: {
-            email: { label: "Email", type: "text", placeholder: "email" },
-            password: { label: "Password", type: "password" }
-          },
-          async authorize(credentials, req) {
-            if (!credentials?.email || !credentials?.password) {
-                throw new Error('Invalid credentials')
-              }
+//     providers: [
+//         CredentialsProvider({
+//           // The name to display on the sign in form (e.g. 'Sign in with...')
+//           name: 'Credentials',
+//           // The credentials is used to generate a suitable form on the sign in page.
+//           // You can specify whatever fields you are expecting to be submitted.
+//           // e.g. domain, username, password, 2FA token, etc.
+//           // You can pass any HTML attribute to the <input> tag through the object.
+//           credentials: {
+//             email: { label: "Email", type: "text", placeholder: "email" },
+//             password: { label: "Password", type: "password" }
+//           },
+//           async authorize(credentials, req) {
+//             if (!credentials?.email || !credentials?.password) {
+//                 throw new Error('Invalid credentials')
+//               }
       
-              const user = await prisma.user.findUnique({
-                where: {
-                  email: credentials.email
-                }
-              })
+//               const user = await prisma.user.findUnique({
+//                 where: {
+//                   email: credentials.email
+//                 }
+//               })
       
-              if (!user || !user?.hashedPassword) {
-                throw new Error('Invalid credentials')
-              }
+//               if (!user || !user?.hashedPassword) {
+//                 throw new Error('Invalid credentials')
+//               }
       
-              const isCorrectPassword = await bcryptjs.compare(
-                credentials.password,
-                user.hashedPassword
-              )
+//               const isCorrectPassword = await bcryptjs.compare(
+//                 credentials.password,
+//                 user.hashedPassword
+//               )
       
-              if (!isCorrectPassword) {
-                throw new Error('Invalid credentials')
-              }
+//               if (!isCorrectPassword) {
+//                 throw new Error('Invalid credentials')
+//               }
       
-              return user
-            }
+//               return user
+//             }
            
-        })
-      ],
-      debug: process.env.NODE_ENV === 'development',
-  session: {
-    strategy: 'jwt'
-  },
-  secret: process.env.NEXTAUTH_SECRET
-}
+//         })
+//       ],
+//       debug: process.env.NODE_ENV === 'development',
+//   session: {
+//     strategy: 'jwt'
+//   },
+//   secret: process.env.NEXTAUTH_SECRET
+// }
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(options)
 
 export { handler as GET, handler as POST }
